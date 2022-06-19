@@ -1,9 +1,11 @@
 <template>
-    <div>
-        <div class="has-text-white">
+    <div class="columns is-multiline" v-if="!results">
+        <div class="column is-12">
             <QuizHeader :title="getActiveQuestion().title" titleSize="4" :show-indicator="true"
                 :totalQuestions="totalQuestions()" :activeQuestion="activeQuestion" />
+        </div>
 
+        <div class="column is-12">
             <div class="columns is-multiline">
                 <div class="column is-6" v-for="answer in getActiveQuestion().answers" :key="answer.title">
                     <button class="button is-light is-outlined is-medium is-fullwidth" :disabled="answerd"
@@ -14,12 +16,18 @@
             </div>
         </div>
     </div>
+    <div class="columns" v-else>
+        <QuizResult :answers="answers" :questions="this.getQuestions()" />
+    </div>
 </template>
 
 <script>
+import QuizResult from './QuizResult'
 import QuizHeader from './QuizHeader'
 export default {
-    components: { QuizHeader },
+    components: {
+        QuizResult, QuizHeader
+    },
     name: 'questions',
     props: ['data'],
     data() {
@@ -32,7 +40,7 @@ export default {
     },
     methods: {
         checkAnswer(answer) {
-            this.answered = true;
+            this.answerd = true;
             this.answers.push(answer + 1);
             this.showNextQuestion()
             console.log(answer, this.answers);
@@ -41,11 +49,14 @@ export default {
             return this.$props.data.length
         },
         getActiveQuestion() {
-            return this.$props.data[this.activeQuestion - 1]
+            return this.getQuestions()[this.activeQuestion - 1]
+        },
+        getQuestions() {
+            return this.$props.data
         },
         showNextQuestion() {
             if (this.activeQuestion < 10) {
-                this.answered = false;
+                this.answerd = false;
                 this.activeQuestion = this.activeQuestion + 1;
             } else {
                 this.showResults();
