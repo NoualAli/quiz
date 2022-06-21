@@ -10,7 +10,7 @@
             <!-- Quiz Questions -->
             <Questions :data="questions" v-else />
         </div>
-        <button class="button is-primary is-large" @click="startQuiz" v-else>Commencer</button>
+        <button class="button is-primary is-large is-outlined" @click="startQuiz" v-else>Commencer</button>
     </div>
 </template>
 
@@ -199,7 +199,6 @@ export default {
         },
         registerParticipent(value) {
             this.participent = value
-            console.log(this.participent);
         },
     }
 }
