@@ -8,7 +8,7 @@
         <div class="column is-12">
             <div class="columns is-multiline">
                 <div class="column is-6" v-for="answer in getActiveQuestion().answers" :key="answer.title">
-                    <button class="button is-light is-outlined is-medium is-fullwidth" :disabled="answerd"
+                    <button class="button is-light is-outlined is-large is-fullwidth" :disabled="answerd"
                         @click.prevent="checkAnswer(getActiveQuestion().answers.indexOf(answer))">
                         {{ answer.title }}
                     </button>
@@ -16,7 +16,7 @@
             </div>
         </div>
     </div>
-    <div class="columns" v-else>
+    <div v-else>
         <QuizResult :answers="answers" :questions="this.getQuestions()" />
     </div>
 </template>
@@ -43,7 +43,6 @@ export default {
             this.answerd = true;
             this.answers.push(answer + 1);
             this.showNextQuestion()
-            console.log(answer, this.answers);
         },
         totalQuestions() {
             return this.$props.data.length
@@ -64,7 +63,10 @@ export default {
         },
         showResults() {
             this.results = true;
-            axios.post('/api/store', {
+            this.storeResults()
+        },
+        storeResults() {
+            axios.post('/api/quiz/store', {
                 name: this.name,
                 answers: this.answers
             })
