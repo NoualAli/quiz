@@ -3,9 +3,9 @@
         <div class="column is-12">
             <QuizHeader title="Merci pour votre participation !" />
         </div>
-        <div class="column is-12 has-text-centered">
-            <div class="d-flex justify-content-between">
-                <svg v-if="success" width="100pt" height="100pt" version="1.1" viewBox="0 0 752 752"
+        <div class="column is-12 has-text-centered has-text-white">
+            <div class="container is-fluid d-flex justify-content-between" v-if="success">
+                <svg width="100pt" height="100pt" version="1.1" viewBox="0 0 752 752"
                     xmlns="http://www.w3.org/2000/svg">
                     <g fill="#47c78e">
                         <path
@@ -20,8 +20,11 @@
                             d="m376 500.87c-43.352 0-78.621-35.27-78.621-78.621 0-2.5547 2.0703-4.625 4.625-4.625h147.99c2.5547 0 4.625 2.0703 4.625 4.625 0.003906 43.352-35.27 78.621-78.621 78.621zm-69.219-73.996c2.3906 36.102 32.523 64.746 69.219 64.746s66.832-28.645 69.219-64.746z" />
                     </g>
                 </svg>
+                <p class="is-size-3 has-text-white">Bien jouer vous avez réaliser un score de {{ getScore() }}</p>
+            </div>
 
-                <svg v-else width="100pt" height="100pt" version="1.1" viewBox="0 0 752 752"
+            <div class="container is-fluid d-flex justify-content-between" v-else>
+                <svg width="100pt" height="100pt" version="1.1" viewBox="0 0 752 752"
                     xmlns="http://www.w3.org/2000/svg">
                     <g fill="#f14568">
                         <path
@@ -38,21 +41,15 @@
                             d="m474.66 341.27c-12.715-0.21484-24.988-4.6836-34.863-12.695-9.875-8.0156-16.773-19.109-19.598-31.508-1.2539-5.4492 2.1484-10.883 7.5977-12.133 5.4492-1.2539 10.879 2.1445 12.133 7.5938 2.2539 9.5352 8.1875 17.793 16.504 22.969 8.3203 5.1719 18.348 6.8477 27.895 4.6602 5.4492-1.2539 10.883 2.1445 12.137 7.5938 1.2539 5.4492-2.1484 10.883-7.5977 12.137-4.6602 1.0547-9.4336 1.5195-14.207 1.3828z" />
                     </g>
                 </svg>
+                <p class="is-size-3 has-text-white">Dommage vous avez réaliser un score de {{ getScore() }}</p>
             </div>
-
-            <!-- <svg v-for="(key, value) in answers" :key="key" xmlns="http://www.w3.org/2000/svg" style="width: 80px"
-                :class="questions[value].answers[key - 1].isTrue ? 'text-success' : 'text-danger'" fill="none"
-                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg> -->
         </div>
 
-        <!-- <div class="col-md-12 mb-5 p-5">
-            <button class="btn btn-lg w-100 btn-dark mb-4" v-if="answerd" @click="endQuiz">
+        <div class="container has-text-centered my-2">
+            <button class="button is-light is-outlined is-large" v-if="completed" @click="replay">
                 Terminer
             </button>
-        </div> -->
+        </div>
     </div>
 </template>
 
@@ -64,6 +61,7 @@ export default {
     props: ['answers', 'questions'],
     data() {
         return {
+            completed: false,
             success: false,
             score: 0
         }
@@ -75,17 +73,31 @@ export default {
     },
     methods: {
         checkResults(key, value) {
-            questions[value].answers[key - 1].isTrue ? this.score + 1 : null
-            if (this.score >= this.$props.questions.length) {
+            const questions = this.$props.questions
+            const answers = questions[value].answers[key - 1]
+            this.setScore(answers)
+
+            if (this.score >= (questions.length / 2)) {
                 this.success = true
             } else {
                 this.success = false
             }
+            this.completed = true
+        },
+        setScore(answers) {
+            if (!this.score) {
+                this.score = 1
+            } else {
+                answers.isTrue ? this.score++ : null
+            }
+        },
+        replay() {
+            window.location.reload()
+        },
+        getScore() {
+            return this.score + ' / ' + this.$props.questions.length
         }
     },
-    mounted() {
-        console.log(this.$props.answers);
-    }
 }
 </script>
 
