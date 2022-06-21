@@ -12,7 +12,7 @@
         </div>
         <div class="field">
             <div class="control">
-                <button class="button is-primary is-medium" @click="registerParticipent()">Soumettre</button>
+                <button class="button is-light is-outlined is-medium" @click="registerParticipent()">Soumettre</button>
             </div>
         </div>
     </div>
