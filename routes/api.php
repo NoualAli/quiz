@@ -21,4 +21,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::prefix('quiz')->group(function () {
     Route::post('store', [QuizController::class, 'store']);
+    Route::post('validate_participent', [QuizController::class, 'validate_participent']);
 });
