@@ -1,11 +1,15 @@
 <template>
     <div class="container" :class="{ 'is-flex is-justify-content-center is-align-items-center': !isStarted }">
+        <div class="notification is-danger" v-if="error">
+            {{ error }}
+        </div>
         <div class="box" id="quiz-box" v-if="isStarted">
             <!-- Quiz Title -->
             <QuizHeader :title="title" v-if="participent == ''"></QuizHeader>
 
             <!-- Quiz Inscription -->
-            <Registration v-if="participent == ''" @register="registerParticipent" />
+            <Registration v-if="participent == ''" @register="registerParticipent" @error="displayError"
+                @clearError="clearError" />
 
             <!-- Quiz Questions -->
             <Questions :data="questions" v-else />
@@ -29,6 +33,7 @@ export default {
             title: "Quiz",
             participent: '',
             isStarted: false,
+            error: '',
             questions: [
                 {
                     id: 1,
@@ -200,6 +205,12 @@ export default {
         registerParticipent(value) {
             this.participent = value
         },
+        displayError(error) {
+            this.error = error
+        },
+        clearError() {
+            this.error = ''
+        }
     }
 }
 </script>

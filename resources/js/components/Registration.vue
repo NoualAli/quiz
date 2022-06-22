@@ -1,13 +1,14 @@
 <template>
-    <div>
+    <form @submit.prevent>
+        <input type="hidden" name="_token" :value="csrf">
         <div class="field">
-            <label for="participent" class="label is-size-5 has-text-white">Nom complet</label>
+            <label for="full_name" class="label is-size-5 has-text-white">Nom complet</label>
             <div class="control">
-                <input type="text" id="participent" class="input is-medium" placeholder="Nom complet"
-                    ref="participent_input" autofocus>
+                <input type="text" id="full_name" class="input is-medium" placeholder="Nom complet" ref="full_name"
+                    name="full_name" autofocus>
             </div>
-            <p class="help is-danger is-size-5" v-if="isEmptyName">
-                Veuillez saisir votre nom s'il vous plaît
+            <p class="help is-danger is-size-5" v-if="errorMessage">
+                {{ errorMessage }}
             </p>
         </div>
         <div class="field">
@@ -15,30 +16,30 @@
                 <button class="button is-light is-outlined is-medium" @click="registerParticipent()">Soumettre</button>
             </div>
         </div>
-    </div>
+    </form>
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
     name: 'Registration',
     data() {
         return {
-            isEmptyName: false
+            errorMessage: null,
+            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
         }
     },
     methods: {
         registerParticipent() {
-            let participent = this.$refs.participent_input.value
-            if (participent !== '' && participent !== undefined) {
-                this.emitRegistration()
-            } else {
-                this.isEmptyName = true
-            }
+            const full_name = this.$refs.full_name.value
+            axios.post('/api/quiz/validate_participent', { 'full_name': full_name, '_token': this.csrf }).then((response) => {
+                this.$emit('clearError', true)
+                this.$emit('register', this.$refs.full_name.value)
+            }).catch((error) => {
+                this.$emit('error', error.response.data.message)
+            })
         },
-        emitRegistration() {
-            this.$emit('register', this.$refs.participent_input.value)
-            this.isEmptyName = false
-        }
     }
 }
 </script>
