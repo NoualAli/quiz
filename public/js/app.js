@@ -5481,6 +5481,10 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
 
 
 
@@ -5496,6 +5500,7 @@ __webpack_require__.r(__webpack_exports__);
       title: "Quiz",
       participent: '',
       isStarted: false,
+      error: '',
       questions: [{
         id: 1,
         title: 'L’approbation de l’acétate de Glatiramére (Glathera) dans le traitement des formes rémittentes de la SEP était en :',
@@ -5620,6 +5625,12 @@ __webpack_require__.r(__webpack_exports__);
     },
     registerParticipent: function registerParticipent(value) {
       this.participent = value;
+    },
+    displayError: function displayError(error) {
+      this.error = error;
+    },
+    clearError: function clearError() {
+      this.error = '';
     }
   }
 });
@@ -5807,6 +5818,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
 //
 //
 //
@@ -5827,26 +5840,31 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: 'Registration',
   data: function data() {
     return {
-      isEmptyName: false
+      errorMessage: null,
+      csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content')
     };
   },
   methods: {
     registerParticipent: function registerParticipent() {
-      var participent = this.$refs.participent_input.value;
+      var _this = this;
 
-      if (participent !== '' && participent !== undefined) {
-        this.emitRegistration();
-      } else {
-        this.isEmptyName = true;
-      }
-    },
-    emitRegistration: function emitRegistration() {
-      this.$emit('register', this.$refs.participent_input.value);
-      this.isEmptyName = false;
+      var full_name = this.$refs.full_name.value;
+      axios__WEBPACK_IMPORTED_MODULE_0___default().post('/api/quiz/validate_participent', {
+        'full_name': full_name,
+        '_token': this.csrf
+      }).then(function (response) {
+        _this.$emit('clearError', true);
+
+        _this.$emit('register', _this.$refs.full_name.value);
+      })["catch"](function (error) {
+        _this.$emit('error', error.response.data.message);
+      });
     }
   }
 });
@@ -28850,6 +28868,12 @@ var render = function () {
       },
     },
     [
+      _vm.error
+        ? _c("div", { staticClass: "notification is-danger" }, [
+            _vm._v("\n        " + _vm._s(_vm.error) + "\n    "),
+          ])
+        : _vm._e(),
+      _vm._v(" "),
       _vm.isStarted
         ? _c(
             "div",
@@ -28861,7 +28885,11 @@ var render = function () {
               _vm._v(" "),
               _vm.participent == ""
                 ? _c("Registration", {
-                    on: { register: _vm.registerParticipent },
+                    on: {
+                      register: _vm.registerParticipent,
+                      error: _vm.displayError,
+                      clearError: _vm.clearError,
+                    },
                   })
                 : _c("Questions", { attrs: { data: _vm.questions } }),
             ],
@@ -29142,56 +29170,72 @@ var render = function () {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", [
-    _c("div", { staticClass: "field" }, [
-      _c(
-        "label",
-        {
-          staticClass: "label is-size-5 has-text-white",
-          attrs: { for: "participent" },
+  return _c(
+    "form",
+    {
+      on: {
+        submit: function ($event) {
+          $event.preventDefault()
         },
-        [_vm._v("Nom complet")]
-      ),
+      },
+    },
+    [
+      _c("input", {
+        attrs: { type: "hidden", name: "_token" },
+        domProps: { value: _vm.csrf },
+      }),
       _vm._v(" "),
-      _c("div", { staticClass: "control" }, [
-        _c("input", {
-          ref: "participent_input",
-          staticClass: "input is-medium",
-          attrs: {
-            type: "text",
-            id: "participent",
-            placeholder: "Nom complet",
-            autofocus: "",
+      _c("div", { staticClass: "field" }, [
+        _c(
+          "label",
+          {
+            staticClass: "label is-size-5 has-text-white",
+            attrs: { for: "full_name" },
           },
-        }),
+          [_vm._v("Nom complet")]
+        ),
+        _vm._v(" "),
+        _c("div", { staticClass: "control" }, [
+          _c("input", {
+            ref: "full_name",
+            staticClass: "input is-medium",
+            attrs: {
+              type: "text",
+              id: "full_name",
+              placeholder: "Nom complet",
+              name: "full_name",
+              autofocus: "",
+            },
+          }),
+        ]),
+        _vm._v(" "),
+        _vm.errorMessage
+          ? _c("p", { staticClass: "help is-danger is-size-5" }, [
+              _vm._v(
+                "\n            " + _vm._s(_vm.errorMessage) + "\n        "
+              ),
+            ])
+          : _vm._e(),
       ]),
       _vm._v(" "),
-      _vm.isEmptyName
-        ? _c("p", { staticClass: "help is-danger is-size-5" }, [
-            _vm._v(
-              "\n            Veuillez saisir votre nom s'il vous plaît\n        "
-            ),
-          ])
-        : _vm._e(),
-    ]),
-    _vm._v(" "),
-    _c("div", { staticClass: "field" }, [
-      _c("div", { staticClass: "control" }, [
-        _c(
-          "button",
-          {
-            staticClass: "button is-light is-outlined is-medium",
-            on: {
-              click: function ($event) {
-                return _vm.registerParticipent()
+      _c("div", { staticClass: "field" }, [
+        _c("div", { staticClass: "control" }, [
+          _c(
+            "button",
+            {
+              staticClass: "button is-light is-outlined is-medium",
+              on: {
+                click: function ($event) {
+                  return _vm.registerParticipent()
+                },
               },
             },
-          },
-          [_vm._v("Soumettre")]
-        ),
+            [_vm._v("Soumettre")]
+          ),
+        ]),
       ]),
-    ]),
-  ])
+    ]
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -41419,6 +41463,18 @@ Vue.compile = compileToFunctions;
 /******/ 				}
 /******/ 			}
 /******/ 			return result;
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/compat get default export */
+/******/ 	(() => {
+/******/ 		// getDefaultExport function for compatibility with non-harmony modules
+/******/ 		__webpack_require__.n = (module) => {
+/******/ 			var getter = module && module.__esModule ?
+/******/ 				() => (module['default']) :
+/******/ 				() => (module);
+/******/ 			__webpack_require__.d(getter, { a: getter });
+/******/ 			return getter;
 /******/ 		};
 /******/ 	})();
 /******/ 	
