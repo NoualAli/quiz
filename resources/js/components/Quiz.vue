@@ -12,7 +12,8 @@
                 @clearError="clearError" />
 
             <!-- Quiz Questions -->
-            <Questions :data="questions" v-else />
+            <Questions :data="questions" :participent="participent" @error="displayError" @clearError="clearError"
+                v-else />
         </div>
         <button class="button is-primary is-large is-outlined" @click="startQuiz" v-else>Commencer</button>
     </div>
