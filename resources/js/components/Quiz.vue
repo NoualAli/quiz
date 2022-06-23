@@ -5,7 +5,7 @@
         </div>
         <div class="box" id="quiz-box" v-if="isStarted">
             <!-- Quiz Title -->
-            <QuizHeader :title="title" v-if="participent == ''"></QuizHeader>
+            <QuizHeader title="Inscription" v-if="participent == ''"></QuizHeader>
 
             <!-- Quiz Inscription -->
             <Registration v-if="participent == ''" @register="registerParticipent" @error="displayError"
@@ -31,7 +31,6 @@ export default {
     name: 'quiz',
     data() {
         return {
-            title: "Quiz",
             participent: '',
             isStarted: false,
             error: '',
