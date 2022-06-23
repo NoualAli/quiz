@@ -27,7 +27,7 @@ export default {
     data() {
         return {
             errorMessage: null,
-            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            csrf: getCSRF()
         }
     },
     methods: {
