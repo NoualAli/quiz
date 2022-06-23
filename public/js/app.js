@@ -5401,7 +5401,7 @@ __webpack_require__.r(__webpack_exports__);
     QuizHeader: _QuizHeader__WEBPACK_IMPORTED_MODULE_1__["default"]
   },
   name: 'questions',
-  props: ['data'],
+  props: ['data', 'participent'],
   data: function data() {
     return {
       activeQuestion: 1,
@@ -5438,13 +5438,14 @@ __webpack_require__.r(__webpack_exports__);
       this.storeResults();
     },
     storeResults: function storeResults() {
+      var _this = this;
+
       axios.post('/api/quiz/store', {
-        name: this.name,
+        full_name: this.$props.participent,
         answers: this.answers
-      }).then(function () {});
-    },
-    endQuiz: function endQuiz() {
-      location.reload();
+      }).then(function () {})["catch"](function (error) {
+        _this.$emit('error', error.response.data.message);
+      });
     }
   }
 });
@@ -5465,6 +5466,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Registration__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Registration */ "./resources/js/components/Registration.vue");
 /* harmony import */ var _QuizHeader__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./QuizHeader */ "./resources/js/components/QuizHeader.vue");
 /* harmony import */ var _Questions__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Questions */ "./resources/js/components/Questions.vue");
+//
 //
 //
 //
@@ -5847,7 +5849,7 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       errorMessage: null,
-      csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+      csrf: getCSRF()
     };
   },
   methods: {
@@ -5915,6 +5917,8 @@ var app = new Vue({
   \***********************************/
 /***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
 
+__webpack_require__(/*! ./helpers */ "./resources/js/helpers.js");
+
 window._ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
 
 try {
@@ -5942,6 +5946,21 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 //     cluster: process.env.MIX_PUSHER_APP_CLUSTER,
 //     forceTLS: true
 // });
+
+/***/ }),
+
+/***/ "./resources/js/helpers.js":
+/*!*********************************!*\
+  !*** ./resources/js/helpers.js ***!
+  \*********************************/
+/***/ (() => {
+
+/**
+ * @return {string}
+ */
+window.getCSRF = function () {
+  return document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+};
 
 /***/ }),
 
@@ -28891,7 +28910,13 @@ var render = function () {
                       clearError: _vm.clearError,
                     },
                   })
-                : _c("Questions", { attrs: { data: _vm.questions } }),
+                : _c("Questions", {
+                    attrs: {
+                      data: _vm.questions,
+                      participent: _vm.participent,
+                    },
+                    on: { error: _vm.displayError, clearError: _vm.clearError },
+                  }),
             ],
             1
           )
