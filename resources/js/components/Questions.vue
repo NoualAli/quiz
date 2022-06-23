@@ -29,7 +29,7 @@ export default {
         QuizResult, QuizHeader
     },
     name: 'questions',
-    props: ['data'],
+    props: ['data', 'participent'],
     data() {
         return {
             activeQuestion: 1,
@@ -67,16 +67,15 @@ export default {
         },
         storeResults() {
             axios.post('/api/quiz/store', {
-                name: this.name,
+                full_name: this.$props.participent,
                 answers: this.answers
             })
                 .then(() => {
 
+                }).catch((error) => {
+                    this.$emit('error', error.response.data.message)
                 })
         },
-        endQuiz() {
-            location.reload();
-        }
     }
 }
 </script>
