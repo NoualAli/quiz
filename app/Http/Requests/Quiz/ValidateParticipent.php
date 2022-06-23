@@ -24,7 +24,7 @@ class ValidateParticipent extends FormRequest
     public function rules()
     {
         return [
-            'full_name' => 'required|string|between:3,50'
+            'full_name' => 'required|unique:quiz_entries,participent|string|between:3,50'
         ];
     }
 }
